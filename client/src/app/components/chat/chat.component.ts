@@ -31,4 +31,4 @@ export class ChatComponent implements OnInit {
     this.userChat.text = '';
   }
 
-}
+} 
