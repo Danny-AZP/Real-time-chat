@@ -1,19 +1,67 @@
-'use strict'
+const mongo = require('mongodb').MongoClient;
+const io = require('socket.io').listen(3000).sockets;
 
-const app = require('express')()
-const serverHttp = require('http').Server(app)
-const io = require('socket.io')(serverHttp)
+// Connect to mongo
+mongo.connect('mongodb+srv://DBUser:andygabriel@cluster0.yfoo5.mongodb.net/chat-real-t', function(err, client){
+    if(err){
+        throw err;
+    }
 
-const myMessages = []
+    console.log('MongoDB connected...');
 
-io.on('connection' , function(socket){
-    socket.on('send-message', function(data){
-        myMessages.push(data) 
-        socket.emit('text-event', myMessages)
-        socket.broadcast.emit('text.event', myMessages)
-    })
-})
+    // Connect to Socket.io
+    io.on('connection', function(socket){
+        let chat = client.db('chat-real-t').collection('chats');
 
-serverHttp.listen(3000, () => {
-    console.log('server runing on port ${3000}')
-})
+        // Create function to send status
+        sendStatus = function(s){
+            socket.emit('status', s);
+        }
+
+        // Get chats from mongo collection
+        chat.find().limit(100).sort({_id:1}).toArray(function(err, res){
+            if(err){
+                throw err;
+            }
+
+            // Emit the messages
+            socket.emit('text-event', res);
+        });
+
+        // Handle input events
+        socket.on('send-message', function(data){
+            let name = data.name;
+            let message = data.message;
+
+            // Check for name and message
+            if(name == '' || message == ''){
+                // Send error status
+                sendStatus('Please enter a name and message');
+            } else {
+                // Insert message
+                chat.insert({name: name, message: message}, function(){
+                    socket.emit('text-event', [data]);
+                    socket.broadcast.emit('text-event', [data]);
+
+                    // Send status object
+                    sendStatus({
+                        message: 'Message sent',
+                        clear: true
+                    });
+                });
+            }
+        });
+
+        // Handle clear
+        socket.on('clear', function(data){
+            // Remove all chats from collection
+            chat.remove({}, function(){
+                // Emit cleared
+                socket.emit('cleared');
+            });
+        });
+    });
+});
+
+
+
