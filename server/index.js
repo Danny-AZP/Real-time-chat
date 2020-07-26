@@ -1,5 +1,5 @@
 const mongo = require('mongodb').MongoClient;
-const io = require('socket.io').listen(3000).sockets;
+const io = require('socket.io').listen(5000).sockets;
 
 // Connect to mongo
 mongo.connect('mongodb+srv://DBUser:andygabriel@cluster0.yfoo5.mongodb.net/chat-real-t', function(err, client){
