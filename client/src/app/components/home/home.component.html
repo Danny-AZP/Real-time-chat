@@ -1,7 +1,7 @@
-<div style="width: 30%; margin: auto; margin-top: 170px">
-    <div class="card p-5">
-        <h4>Escribe tu nombre y uneté al chat</h4>
+<div style="width: 30%; margin: auto; margin-top: 170px; background-color:#575756 !important;">
+    <div class="card p-5" style="background-color:#575756">
+        <h4 style="color:aliceblue">Escribe tu nombre y uneté al chat</h4>
         <input type="text" class="form-control" [(ngModel)]="User.name">
-        <a href="" class="btn btn-primary btn-block mt-3" [routerLink]="['/chat', User.name]">Unirme al chat</a>
+        <a href="" class="btn btn-dark m-2 m-lg-4" [routerLink]="['/chat', User.name]">Unirme al chat</a>
     </div>
 </div> 

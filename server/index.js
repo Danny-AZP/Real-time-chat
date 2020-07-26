@@ -1,5 +1,5 @@
 const mongo = require('mongodb').MongoClient;
-const io = require('socket.io').listen(5000).sockets;
+const io = require('socket.io').listen(3000).sockets;
 
 // Connect to mongo
 mongo.connect('mongodb+srv://DBUser:andygabriel@cluster0.yfoo5.mongodb.net/chat-real-t', function(err, client){
@@ -18,15 +18,7 @@ mongo.connect('mongodb+srv://DBUser:andygabriel@cluster0.yfoo5.mongodb.net/chat-
             socket.emit('status', s);
         }
 
-        // Get chats from mongo collection
-        chat.find().limit(100).sort({_id:1}).toArray(function(err, res){
-            if(err){
-                throw err;
-            }
 
-            // Emit the messages
-            socket.emit('text-event', res);
-        });
 
         // Handle input events
         socket.on('send-message', function(data){
@@ -49,6 +41,15 @@ mongo.connect('mongodb+srv://DBUser:andygabriel@cluster0.yfoo5.mongodb.net/chat-
                         clear: true
                     });
                 });
+                        // Get chats from mongo collection
+        chat.find().limit(100).sort({_id:1}).toArray(function(err, res){
+            if(err){
+                throw err;
+            }
+
+            // Emit the messages
+            socket.emit('text-event', res);
+        });
             }
         });
 
